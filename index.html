@@ -4,439 +4,928 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>hialdev01</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0a0a1a;
+  --card: #0d0d20;
+  --border: rgba(255,255,255,0.08);
+  --accent: #7DF9FF;
+  --accent2: #FF5F5F;
+  --accent3: #A78BFA;
+  --green: #4ADE80;
+  --yellow: #FFD700;
+  --text: #e8e8f0;
+  --sub: #666680;
+  --s: 3px;
+}
 
-  :root {
-    --bg: #050508;
-    --card: #0d0d14;
-    --border: rgba(255,255,255,0.07);
-    --accent: #7DF9FF;
-    --accent2: #FF5F5F;
-    --accent3: #A78BFA;
-    --text: #e8e8f0;
-    --sub: #666680;
-  }
+*, html { cursor: none !important; }
 
-  body {
-    background: var(--bg);
-    font-family: 'Space Mono', monospace;
-    color: var(--text);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-  }
+body {
+  background: var(--bg);
+  font-family: 'Space Mono', monospace;
+  color: var(--text);
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
 
-  /* Animated background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(125,249,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(125,249,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    animation: gridMove 20s linear infinite;
-    pointer-events: none;
-  }
+/* ═══════════════════════════════════
+   PIXEL SKY BACKGROUND
+═══════════════════════════════════ */
+#sky-canvas {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  image-rendering: pixelated;
+}
 
-  @keyframes gridMove {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(40px); }
-  }
+/* ═══════════════════════════════════
+   PIXEL MOUNTAINS (CSS)
+═══════════════════════════════════ */
+.mountains {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: 200px; pointer-events: none; z-index: 1;
+  image-rendering: pixelated;
+}
+.mountain-layer {
+  position: absolute; bottom: 0; width: 100%; height: 100%;
+}
 
-  /* Glowing orbs */
-  .orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.12;
-    animation: orbFloat 8s ease-in-out infinite;
-    pointer-events: none;
-  }
-  .orb1 { width: 400px; height: 400px; background: var(--accent3); top: -100px; left: -100px; animation-delay: 0s; }
-  .orb2 { width: 300px; height: 300px; background: var(--accent); bottom: -50px; right: -50px; animation-delay: -4s; }
-  .orb3 { width: 200px; height: 200px; background: var(--accent2); top: 50%; left: 50%; animation-delay: -2s; }
+/* ═══════════════════════════════════
+   SCROLLING PIXEL GROUND LAYERS
+═══════════════════════════════════ */
+.bg-ground {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  pointer-events: none; z-index: 2;
+}
+.bg-ground-strip {
+  height: 8px;
+  background: repeating-linear-gradient(
+    90deg,
+    #1a3a1a 0px, #1a3a1a 8px,
+    #0d2010 8px, #0d2010 16px
+  );
+  animation: groundScroll1 2s linear infinite;
+}
+.bg-ground-strip2 {
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    #2a5a2a 0px, #2a5a2a 6px,
+    #1a3a1a 6px, #1a3a1a 12px
+  );
+  animation: groundScroll1 1.2s linear infinite;
+}
+.bg-ground-strip3 {
+  height: 4px;
+  background: repeating-linear-gradient(
+    90deg,
+    #3d8b3d 0px, #3d8b3d 4px,
+    #2a5a2a 4px, #2a5a2a 8px
+  );
+  animation: groundScroll1 0.8s linear infinite;
+}
+@keyframes groundScroll1 { 0%{background-position:0 0} 100%{background-position:-16px 0} }
 
-  @keyframes orbFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(20px, -20px) scale(1.1); }
-  }
+/* ═══════════════════════════════════
+   FLOATING PIXEL CLOUDS
+═══════════════════════════════════ */
+.pixel-cloud {
+  position: fixed;
+  pointer-events: none; z-index: 1;
+  image-rendering: pixelated;
+}
+.pixel-cloud .c {
+  position: absolute; width: 8px; height: 8px;
+  background: rgba(255,255,255,0.12);
+}
 
-  .card {
-    position: relative;
-    width: 420px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    padding: 40px 36px;
-    overflow: hidden;
-    animation: cardIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-    box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 40px 80px rgba(0,0,0,0.6);
-  }
+/* ═══════════════════════════════════
+   PIXEL STARS
+═══════════════════════════════════ */
+.star {
+  position: fixed; border-radius: 0;
+  pointer-events: none; z-index: 1;
+  image-rendering: pixelated;
+  animation: starTwinkle 1.5s ease-in-out infinite;
+}
+@keyframes starTwinkle { 0%,100%{opacity:1} 50%{opacity:0.1} }
 
-  @keyframes cardIn {
-    from { opacity: 0; transform: translateY(30px) scale(0.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-  }
+/* ═══════════════════════════════════
+   PIXEL BIRDS
+═══════════════════════════════════ */
+.pixel-bird {
+  position: fixed; pointer-events: none; z-index: 2;
+  image-rendering: pixelated;
+  animation: birdFly linear infinite;
+}
+@keyframes birdFly {
+  0%   { transform: translateX(-60px); }
+  100% { transform: translateX(calc(100vw + 60px)); }
+}
 
-  /* Card shimmer border */
-  .card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 24px;
-    padding: 1px;
-    background: linear-gradient(135deg, rgba(125,249,255,0.3), transparent 40%, rgba(167,139,250,0.3));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-  }
+/* ═══════════════════════════════════
+   CUSTOM CURSOR
+═══════════════════════════════════ */
+#cursor {
+  position: fixed; pointer-events: none; z-index: 9999;
+  image-rendering: pixelated;
+  transform: translate(-2px, -2px);
+}
+#cursor .px { position: absolute; width: 4px; height: 4px; background: var(--accent); }
+.trail-dot {
+  position: fixed; width: 4px; height: 4px;
+  background: var(--accent3); pointer-events: none; z-index: 9998;
+  image-rendering: pixelated;
+}
 
-  /* Scan line effect */
-  .card::after {
-    content: '';
-    position: absolute;
-    top: -100%;
-    left: 0;
-    right: 0;
-    height: 200%;
-    background: linear-gradient(transparent 40%, rgba(125,249,255,0.015) 50%, transparent 60%);
-    animation: scan 6s linear infinite;
-    pointer-events: none;
-  }
-  @keyframes scan {
-    0% { transform: translateY(-50%); }
-    100% { transform: translateY(50%); }
-  }
+/* ═══════════════════════════════════
+   SCENE & CARD
+═══════════════════════════════════ */
+.scene {
+  position: relative; z-index: 10;
+  display: flex; flex-direction: column; align-items: center;
+  animation: cardIn 0.8s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes cardIn { from{opacity:0;transform:translateY(30px) scale(0.96)} to{opacity:1;transform:translateY(0) scale(1)} }
 
-  /* Header */
-  .header {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-bottom: 28px;
-    animation: fadeUp 0.6s 0.2s both;
-  }
-  .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-  }
-  .dot1 { background: var(--accent2); animation-delay: 0s; }
-  .dot2 { background: #FFD700; animation-delay: 0.2s; }
-  .dot3 { background: #4ADE80; animation-delay: 0.4s; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-  .header-line {
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-    margin-left: 8px;
-  }
+.card {
+  position: relative; width: 440px;
+  background: rgba(10,10,26,0.92);
+  border: 2px solid var(--accent3);
+  border-radius: 0px;
+  padding: 32px 36px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 4px rgba(167,139,250,0.1),
+    0 0 40px rgba(167,139,250,0.2),
+    inset 0 0 60px rgba(0,0,0,0.4);
+  /* pixel border effect */
+  image-rendering: pixelated;
+}
 
-  /* Name */
-  .name-section {
-    margin-bottom: 8px;
-    animation: fadeUp 0.6s 0.3s both;
-  }
-  .name {
-    font-family: 'Syne', sans-serif;
-    font-size: 36px;
-    font-weight: 800;
-    letter-spacing: -1px;
-    line-height: 1;
-    background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  .cursor {
-    display: inline-block;
-    width: 3px;
-    height: 32px;
-    background: var(--accent);
-    margin-left: 3px;
-    vertical-align: middle;
-    animation: blink 1s step-end infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+/* pixel corner decorations */
+.card::before {
+  content: '';
+  position: absolute; inset: 4px;
+  border: 1px solid rgba(125,249,255,0.1);
+  pointer-events: none;
+}
+.card::after {
+  content: '';
+  position: absolute; top: -100%; left: 0; right: 0; height: 200%;
+  background: linear-gradient(transparent 40%, rgba(125,249,255,0.015) 50%, transparent 60%);
+  animation: scan 5s linear infinite; pointer-events: none;
+}
+@keyframes scan{0%{transform:translateY(-50%)}100%{transform:translateY(50%)}}
 
-  /* Tags */
-  .tags {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin: 14px 0 28px;
-    animation: fadeUp 0.6s 0.4s both;
-  }
-  .tag {
-    padding: 4px 12px;
-    border-radius: 100px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    border: 1px solid;
-    transition: all 0.2s;
-  }
-  .tag:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.4); }
-  .tag-cyan { color: var(--accent); border-color: rgba(125,249,255,0.3); background: rgba(125,249,255,0.05); }
-  .tag-purple { color: var(--accent3); border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.05); }
-  .tag-red { color: var(--accent2); border-color: rgba(255,95,95,0.3); background: rgba(255,95,95,0.05); }
+/* pixel corner brackets */
+.corner { position: absolute; width: 12px; height: 12px; }
+.corner-tl { top: 6px; left: 6px; border-top: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+.corner-tr { top: 6px; right: 6px; border-top: 2px solid var(--accent); border-right: 2px solid var(--accent); }
+.corner-bl { bottom: 6px; left: 6px; border-bottom: 2px solid var(--accent); border-left: 2px solid var(--accent); }
+.corner-br { bottom: 6px; right: 6px; border-bottom: 2px solid var(--accent); border-right: 2px solid var(--accent); }
 
-  /* Divider */
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
-    margin: 24px 0;
-  }
+/* header pixel dots */
+.header { display:flex;align-items:center;gap:4px;margin-bottom:20px; }
+.dot { width:8px;height:8px;border-radius:0;animation:pulse 2s ease-in-out infinite; }
+.dot1{background:var(--accent2)} .dot2{background:var(--yellow);animation-delay:.2s} .dot3{background:var(--green);animation-delay:.4s}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.header-line { flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--accent3) 0,var(--accent3) 4px,transparent 4px,transparent 8px);margin-left:8px;opacity:0.4; }
 
-  /* Sub label */
-  .sub-label {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--sub);
-    margin-bottom: 16px;
-    animation: fadeUp 0.6s 0.5s both;
-  }
+/* STATUS */
+.status-bar {
+  display:flex;align-items:center;gap:6px;margin-bottom:10px;
+  font-family:'Press Start 2P',monospace;font-size:7px;color:var(--green);letter-spacing:0.5px;
+}
+.status-dot {
+  width:6px;height:6px;border-radius:0;background:var(--green);
+  animation:statusPulse 1s steps(1) infinite;
+  box-shadow:0 0 8px var(--green);
+}
+@keyframes statusPulse{0%,100%{opacity:1}50%{opacity:0}}
 
-  /* Buttons */
-  .buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    animation: fadeUp 0.6s 0.6s both;
-  }
-  .btn-row { display: flex; gap: 10px; }
+/* GLITCH NAME */
+.name-section { margin-bottom: 6px; }
+.name {
+  font-family:'Press Start 2P',monospace;
+  font-size:22px;font-weight:400;letter-spacing:1px;line-height:1.3;
+  position:relative;display:inline-block;
+  color: var(--accent);
+  text-shadow: 2px 2px 0 rgba(125,249,255,0.3), -2px 0 var(--accent3), 2px 0 var(--accent2);
+  filter: drop-shadow(0 0 8px rgba(125,249,255,0.5));
+}
+.name.glitching {
+  animation: glitchShake 0.15s steps(2) forwards;
+}
+.name.glitching::before {
+  content: attr(data-text);
+  position:absolute;left:3px;top:0;
+  color:var(--accent2);
+  clip-path:inset(20% 0 60% 0);
+  animation:glitch1 0.15s steps(2) forwards;
+}
+.name.glitching::after {
+  content: attr(data-text);
+  position:absolute;left:-3px;top:0;
+  color:var(--accent3);
+  clip-path:inset(60% 0 10% 0);
+  animation:glitch2 0.15s steps(2) forwards;
+}
+@keyframes glitchShake{0%{transform:translate(2px,0)}50%{transform:translate(-2px,1px)}100%{transform:translate(0,0)}}
+@keyframes glitch1{0%{clip-path:inset(20% 0 60% 0)}50%{clip-path:inset(55% 0 15% 0)}100%{clip-path:inset(0)}}
+@keyframes glitch2{0%{clip-path:inset(60% 0 10% 0)}50%{clip-path:inset(10% 0 65% 0)}100%{clip-path:inset(0)}}
 
-  .btn {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    text-decoration: none;
-    border: 1px solid;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-    letter-spacing: 0.3px;
-  }
-  .btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-  .btn:hover { transform: translateY(-2px); }
-  .btn:hover::before { opacity: 1; }
-  .btn:active { transform: translateY(0) scale(0.98); }
+.cursor {
+  display:inline-block;width:12px;height:3px;background:var(--accent);
+  margin-left:4px;vertical-align:middle;
+  animation:blink 0.8s steps(1) infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-  /* Ripple */
-  .btn .ripple {
-    position: absolute;
-    border-radius: 50%;
-    width: 0; height: 0;
-    background: rgba(255,255,255,0.15);
-    transform: translate(-50%, -50%);
-    animation: rippleAnim 0.5s ease-out forwards;
-  }
-  @keyframes rippleAnim {
-    to { width: 200px; height: 200px; opacity: 0; }
-  }
+/* TYPEWRITER BIO */
+.bio {
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;color:var(--sub);margin-bottom:6px;
+  min-height:14px;letter-spacing:0.3px;line-height:1.8;
+}
+.bio-cursor{color:var(--accent);animation:blink 0.8s steps(1) infinite}
 
-  .btn-support {
-    color: var(--accent2);
-    border-color: rgba(255,95,95,0.25);
-    background: rgba(255,95,95,0.05);
-  }
-  .btn-support::before { background: rgba(255,95,95,0.08); }
-  .btn-support:hover { border-color: rgba(255,95,95,0.5); box-shadow: 0 8px 24px rgba(255,95,95,0.15); }
+/* TAGS */
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 20px}
+.tag {
+  padding:5px 10px;border-radius:0;font-family:'Press Start 2P',monospace;
+  font-size:7px;font-weight:400;letter-spacing:0.5px;text-transform:uppercase;
+  border:2px solid;transition:all 0.1s;image-rendering:pixelated;
+}
+.tag:hover{transform:translate(-2px,-2px);box-shadow:2px 2px 0 currentColor}
+.tag-cyan{color:var(--accent);border-color:var(--accent);background:rgba(125,249,255,0.08)}
+.tag-purple{color:var(--accent3);border-color:var(--accent3);background:rgba(167,139,250,0.08)}
+.tag-red{color:var(--accent2);border-color:var(--accent2);background:rgba(255,95,95,0.08)}
 
-  .btn-tiktok {
-    color: #fff;
-    border-color: rgba(255,255,255,0.12);
-    background: rgba(255,255,255,0.04);
-  }
-  .btn-tiktok::before { background: rgba(255,255,255,0.06); }
-  .btn-tiktok:hover { border-color: rgba(255,255,255,0.25); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.divider{
+  height:2px;margin:18px 0;
+  background:repeating-linear-gradient(90deg,var(--accent3) 0,var(--accent3) 4px,transparent 4px,transparent 8px);
+  opacity:0.3;
+}
+.sub-label{
+  font-family:'Press Start 2P',monospace;font-size:7px;
+  letter-spacing:1px;text-transform:uppercase;color:var(--sub);margin-bottom:14px;
+}
 
-  .btn-whatsapp {
-    color: #4ADE80;
-    border-color: rgba(74,222,128,0.25);
-    background: rgba(74,222,128,0.05);
-  }
-  .btn-whatsapp::before { background: rgba(74,222,128,0.08); }
-  .btn-whatsapp:hover { border-color: rgba(74,222,128,0.5); box-shadow: 0 8px 24px rgba(74,222,128,0.15); }
+/* BUTTONS */
+.buttons{display:flex;flex-direction:column;gap:8px}
+.btn-row{display:flex;gap:8px}
+.btn {
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:10px 14px;border-radius:0;
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;font-weight:400;text-decoration:none;border:2px solid;
+  cursor:none;transition:all 0.1s;
+  position:relative;overflow:hidden;letter-spacing:.3px;
+  image-rendering:pixelated;
+}
+.btn:hover{transform:translate(-2px,-2px)}
+.btn:hover::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0.05)}
+.btn:active{transform:translate(1px,1px)}
 
-  .btn-discord {
-    color: var(--accent3);
-    border-color: rgba(167,139,250,0.25);
-    background: rgba(167,139,250,0.05);
-  }
-  .btn-discord::before { background: rgba(167,139,250,0.08); }
-  .btn-discord:hover { border-color: rgba(167,139,250,0.5); box-shadow: 0 8px 24px rgba(167,139,250,0.15); }
+.btn .ripple{
+  position:absolute;border-radius:0;width:0;height:0;
+  background:rgba(255,255,255,0.15);transform:translate(-50%,-50%);
+  animation:rippleAnim 0.4s ease-out forwards;
+}
+@keyframes rippleAnim{to{width:200px;height:200px;opacity:0}}
 
-  /* Icon SVGs inline */
-  .icon { width: 14px; height: 14px; flex-shrink: 0; }
+.btn-support{color:var(--accent2);border-color:var(--accent2);background:rgba(255,95,95,0.05)}
+.btn-support:hover{box-shadow:3px 3px 0 var(--accent2)}
+.btn-tiktok{color:#fff;border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.03)}
+.btn-tiktok:hover{box-shadow:3px 3px 0 rgba(255,255,255,0.3)}
+.btn-whatsapp{color:var(--green);border-color:var(--green);background:rgba(74,222,128,0.05)}
+.btn-whatsapp:hover{box-shadow:3px 3px 0 var(--green)}
+.btn-discord{color:var(--accent3);border-color:var(--accent3);background:rgba(167,139,250,0.05)}
+.btn-discord:hover{box-shadow:3px 3px 0 var(--accent3)}
+.icon{width:12px;height:12px;flex-shrink:0}
 
-  /* Footer */
-  .footer {
-    text-align: center;
-    margin-top: 24px;
-    font-size: 11px;
-    color: var(--sub);
-    animation: fadeUp 0.6s 0.8s both;
-  }
-  .footer span {
-    color: var(--accent2);
-    animation: heartbeat 1.5s ease-in-out infinite;
-    display: inline-block;
-  }
-  @keyframes heartbeat {
-    0%,100%{transform:scale(1)} 14%{transform:scale(1.3)} 28%{transform:scale(1)}
-  }
+.footer{
+  text-align:center;margin-top:20px;
+  font-family:'Press Start 2P',monospace;font-size:7px;color:var(--sub);
+  line-height:2;
+}
+.footer span{color:var(--accent2);animation:heartbeat 1.5s ease-in-out infinite;display:inline-block}
+@keyframes heartbeat{0%,100%{transform:scale(1)}14%{transform:scale(1.4)}28%{transform:scale(1)}}
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+/* ═══════════════════════════════════
+   GROUND / GAME STRIP
+═══════════════════════════════════ */
+.ground{
+  position:relative;width:440px;height:60px;
+  overflow:hidden;flex-shrink:0;z-index:10;
+  background: rgba(8,8,20,0.85);
+  border: 2px solid var(--accent3);
+  border-top: none;
+}
 
-  /* Particle canvas */
-  #particles {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.4;
-  }
+.floor-tile {
+  position:absolute;bottom:0;left:0;width:200%;height:14px;
+  background:repeating-linear-gradient(
+    90deg,
+    #1a3a5c 0,#1a3a5c 14px,
+    #0d2040 14px,#0d2040 28px
+  );
+  animation:tileScroll 0.7s linear infinite;
+}
+.floor-tile2 {
+  position:absolute;bottom:14px;left:0;width:200%;height:4px;
+  background:repeating-linear-gradient(
+    90deg,
+    rgba(125,249,255,0.3) 0,rgba(125,249,255,0.3) 7px,
+    transparent 7px,transparent 14px
+  );
+  animation:tileScroll 0.7s linear infinite;
+}
+@keyframes tileScroll{0%{transform:translateX(0)}100%{transform:translateX(-28px)}}
+
+.score-display{
+  position:absolute;top:5px;right:8px;
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;color:var(--yellow);
+  text-shadow:0 0 6px var(--yellow);
+  letter-spacing:1px;z-index:2;
+}
+
+.hi-display{
+  position:absolute;top:5px;left:8px;
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;color:var(--accent3);
+  text-shadow:0 0 6px var(--accent3);
+  letter-spacing:1px;z-index:2;
+}
+
+/* PIXEL RUNNER */
+.runner-wrap{
+  position:absolute;bottom:14px;
+  image-rendering:pixelated;
+}
+.pixel-guy{
+  position:relative;width:1px;height:1px;
+  image-rendering:pixelated;
+}
+.pixel-guy.f1{box-shadow:
+  calc(3*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(4*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(5*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(3*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(5*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-11*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-11*var(--s)) 0 var(--s) #222,
+  calc(5*var(--s)) calc(-11*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(5*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(5*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(3*var(--s)) calc(-8*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-8*var(--s))  0 var(--s) #7DF9FF,
+  calc(5*var(--s)) calc(-8*var(--s))  0 var(--s) #A78BFA,
+  calc(3*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(5*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(2*var(--s)) calc(-9*var(--s))  0 var(--s) #FFD59E,
+  calc(6*var(--s)) calc(-8*var(--s))  0 var(--s) #FFD59E,
+  calc(7*var(--s)) calc(-7*var(--s))  0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-6*var(--s))  0 var(--s) #555,
+  calc(5*var(--s)) calc(-6*var(--s))  0 var(--s) #555,
+  calc(2*var(--s)) calc(-5*var(--s))  0 var(--s) #555,
+  calc(5*var(--s)) calc(-5*var(--s))  0 var(--s) #555,
+  calc(2*var(--s)) calc(-4*var(--s))  0 var(--s) #FF5F5F,
+  calc(6*var(--s)) calc(-4*var(--s))  0 var(--s) #FF5F5F;
+}
+.pixel-guy.f2{box-shadow:
+  calc(3*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(4*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(5*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(3*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(5*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-11*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-11*var(--s)) 0 var(--s) #222,
+  calc(5*var(--s)) calc(-11*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(5*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(5*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(3*var(--s)) calc(-8*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-8*var(--s))  0 var(--s) #7DF9FF,
+  calc(5*var(--s)) calc(-8*var(--s))  0 var(--s) #A78BFA,
+  calc(3*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(5*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(6*var(--s)) calc(-9*var(--s))  0 var(--s) #FFD59E,
+  calc(2*var(--s)) calc(-8*var(--s))  0 var(--s) #FFD59E,
+  calc(1*var(--s)) calc(-7*var(--s))  0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-6*var(--s))  0 var(--s) #555,
+  calc(4*var(--s)) calc(-5*var(--s))  0 var(--s) #555,
+  calc(3*var(--s)) calc(-4*var(--s))  0 var(--s) #FF5F5F,
+  calc(5*var(--s)) calc(-6*var(--s))  0 var(--s) #555,
+  calc(6*var(--s)) calc(-5*var(--s))  0 var(--s) #555,
+  calc(6*var(--s)) calc(-4*var(--s))  0 var(--s) #FF5F5F;
+}
+.pixel-guy.fj{box-shadow:
+  calc(3*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(4*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(5*var(--s)) calc(-13*var(--s)) 0 var(--s) #5c3a1e,
+  calc(3*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(5*var(--s)) calc(-12*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-11*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-11*var(--s)) 0 var(--s) #222,
+  calc(5*var(--s)) calc(-11*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(4*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(5*var(--s)) calc(-10*var(--s)) 0 var(--s) #FFD59E,
+  calc(3*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(5*var(--s)) calc(-9*var(--s))  0 var(--s) #A78BFA,
+  calc(3*var(--s)) calc(-8*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-8*var(--s))  0 var(--s) #7DF9FF,
+  calc(5*var(--s)) calc(-8*var(--s))  0 var(--s) #A78BFA,
+  calc(3*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(4*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(5*var(--s)) calc(-7*var(--s))  0 var(--s) #A78BFA,
+  calc(1*var(--s)) calc(-8*var(--s))  0 var(--s) #FFD59E,
+  calc(7*var(--s)) calc(-8*var(--s))  0 var(--s) #FFD59E,
+  calc(2*var(--s)) calc(-5*var(--s))  0 var(--s) #555,
+  calc(3*var(--s)) calc(-5*var(--s))  0 var(--s) #555,
+  calc(5*var(--s)) calc(-5*var(--s))  0 var(--s) #555,
+  calc(6*var(--s)) calc(-5*var(--s))  0 var(--s) #555,
+  calc(2*var(--s)) calc(-4*var(--s))  0 var(--s) #FF5F5F,
+  calc(6*var(--s)) calc(-4*var(--s))  0 var(--s) #FF5F5F;
+}
+
+/* OBSTACLE pixel cactus */
+.obstacle{position:absolute;bottom:14px;image-rendering:pixelated;width:1px;height:1px}
+.obstacle::before{
+  content:'';position:absolute;width:1px;height:1px;
+  box-shadow:
+    calc(2*var(--s)) calc(-8*var(--s)) 0 var(--s) #4ADE80,
+    calc(2*var(--s)) calc(-7*var(--s)) 0 var(--s) #4ADE80,
+    calc(2*var(--s)) calc(-6*var(--s)) 0 var(--s) #4ADE80,
+    calc(2*var(--s)) calc(-5*var(--s)) 0 var(--s) #4ADE80,
+    calc(2*var(--s)) calc(-4*var(--s)) 0 var(--s) #4ADE80,
+    calc(2*var(--s)) calc(-3*var(--s)) 0 var(--s) #4ADE80,
+    calc(2*var(--s)) calc(-2*var(--s)) 0 var(--s) #4ADE80,
+    calc(2*var(--s)) calc(-1*var(--s)) 0 var(--s) #4ADE80,
+    calc(1*var(--s)) calc(-6*var(--s)) 0 var(--s) #4ADE80,
+    calc(0*var(--s)) calc(-5*var(--s)) 0 var(--s) #4ADE80,
+    calc(3*var(--s)) calc(-5*var(--s)) 0 var(--s) #4ADE80,
+    calc(4*var(--s)) calc(-4*var(--s)) 0 var(--s) #4ADE80;
+}
+
+/* DUST */
+.dust{position:absolute;bottom:14px;pointer-events:none}
+.dust-particle{position:absolute;width:3px;height:3px;border-radius:0;background:var(--accent);opacity:0}
+.dust-particle:nth-child(1){animation:dustA .5s 0s ease-out infinite}
+.dust-particle:nth-child(2){animation:dustA .5s .17s ease-out infinite}
+.dust-particle:nth-child(3){animation:dustA .5s .33s ease-out infinite}
+@keyframes dustA{0%{opacity:.7;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(-14px,-10px) scale(.2)}}
 </style>
 </head>
 <body>
 
-<canvas id="particles"></canvas>
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
-<div class="orb orb3"></div>
+<canvas id="sky-canvas"></canvas>
 
-<div class="card">
-  <div class="header">
-    <div class="dot dot1"></div>
-    <div class="dot dot2"></div>
-    <div class="dot dot3"></div>
-    <div class="header-line"></div>
-  </div>
+<!-- custom cursor -->
+<div id="cursor">
+  <div class="px" style="left:0;top:0"></div>
+  <div class="px" style="left:4px;top:4px"></div>
+  <div class="px" style="left:8px;top:8px"></div>
+  <div class="px" style="left:4px;top:8px"></div>
+  <div class="px" style="left:8px;top:4px"></div>
+</div>
+<div id="cursor-trail"></div>
 
-  <div class="name-section">
-    <div class="name">hialdev01<span class="cursor"></span></div>
-  </div>
+<div class="scene">
+  <div class="card">
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
 
-  <div class="tags">
-    <span class="tag tag-cyan">Creator</span>
-    <span class="tag tag-purple">Developer</span>
-    <span class="tag tag-red">Digital Builder</span>
-  </div>
-
-  <div class="divider"></div>
-  <div class="sub-label">Links &amp; Community</div>
-
-  <div class="buttons">
-    <div class="btn-row">
-      <a href="https://sociabuzz.com/lalzyx_/donate" class="btn btn-support" onclick="ripple(event)">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
-        Support Me
-      </a>
-      <a href="https://tiktok.com/@hialdev01" class="btn btn-tiktok" onclick="ripple(event)">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.27 8.27 0 004.84 1.55V6.79a4.85 4.85 0 01-1.07-.1z"/></svg>
-        @hialdev01
-      </a>
+    <div class="header">
+      <div class="dot dot1"></div>
+      <div class="dot dot2"></div>
+      <div class="dot dot3"></div>
+      <div class="header-line"></div>
     </div>
-    <div class="btn-row">
-      <a href="https://chat.whatsapp.com/LDKBiA1mf24BB7jKUkYVDV" class="btn btn-whatsapp" onclick="ripple(event)">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        PT PT X8
-      </a>
-      <a href="https://discord.gg/ws4aVYDecJ" class="btn btn-discord" onclick="ripple(event)">
-        <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
-        Anomali Server
-      </a>
+
+    <div class="status-bar">
+      <div class="status-dot"></div>
+      <span>● ONLINE — ACTIVE</span>
+    </div>
+
+    <div class="name-section">
+      <div class="name" id="glitch-name" data-text="hialdev01">hialdev01<span class="cursor"></span></div>
+    </div>
+
+    <div class="bio" id="bio-text"><span class="bio-cursor">█</span></div>
+
+    <div class="tags">
+      <span class="tag tag-cyan">Creator</span>
+      <span class="tag tag-purple">Dev</span>
+      <span class="tag tag-red">Builder</span>
+    </div>
+
+    <div class="divider"></div>
+    <div class="sub-label">▶ Links &amp; Community</div>
+
+    <div class="buttons">
+      <div class="btn-row">
+        <a href="https://sociabuzz.com/lalzyx_/donate" class="btn btn-support" onclick="ripple(event)">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
+          Support Me
+        </a>
+        <a href="https://tiktok.com/@hialdev01" class="btn btn-tiktok" onclick="ripple(event)">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.27 8.27 0 004.84 1.55V6.79a4.85 4.85 0 01-1.07-.1z"/></svg>
+          @hialdev01
+        </a>
+      </div>
+      <div class="btn-row">
+        <a href="https://chat.whatsapp.com/LDKBiA1mf24BB7jKUkYVDV" class="btn btn-whatsapp" onclick="ripple(event)">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          PT PT X8
+        </a>
+        <a href="https://discord.gg/ws4aVYDecJ" class="btn btn-discord" onclick="ripple(event)">
+          <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/></svg>
+          Anomali
+        </a>
+      </div>
+    </div>
+
+    <div class="footer">
+      Thanks for supporting &amp; joining<br>the community <span>♥</span>
     </div>
   </div>
 
-  <div class="footer">
-    Thanks for supporting &amp; joining the community <span>🤍</span>
+  <!-- GAME STRIP -->
+  <div class="ground" id="ground">
+    <div class="hi-display" id="hi-score">HI: 00000</div>
+    <div class="score-display" id="score">SCORE: 00000</div>
+    <div class="floor-tile"></div>
+    <div class="floor-tile2"></div>
+    <div class="runner-wrap" id="runner-wrap" style="left:50px">
+      <div class="pixel-guy f1" id="runner"></div>
+      <div class="dust" id="dust">
+        <div class="dust-particle"></div>
+        <div class="dust-particle"></div>
+        <div class="dust-particle"></div>
+      </div>
+    </div>
+    <div class="obstacle" id="obstacle" style="left:600px"></div>
   </div>
 </div>
 
 <script>
-// Ripple effect
+// ══════════════════════════════════
+// PIXEL SKY CANVAS
+// ══════════════════════════════════
+const skyCanvas = document.getElementById('sky-canvas');
+const sctx = skyCanvas.getContext('2d');
+skyCanvas.width = window.innerWidth;
+skyCanvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  skyCanvas.width = window.innerWidth;
+  skyCanvas.height = window.innerHeight;
+  buildStars();
+});
+
+// Pixel-perfect gradient sky
+function drawSky() {
+  const grad = sctx.createLinearGradient(0, 0, 0, skyCanvas.height);
+  grad.addColorStop(0,   '#020210');
+  grad.addColorStop(0.4, '#060620');
+  grad.addColorStop(0.7, '#0a0a30');
+  grad.addColorStop(1,   '#0d1540');
+  sctx.fillStyle = grad;
+  sctx.fillRect(0, 0, skyCanvas.width, skyCanvas.height);
+}
+
+// PIXEL STARS
+const stars = [];
+function buildStars() {
+  stars.length = 0;
+  const count = Math.floor((skyCanvas.width * skyCanvas.height) / 3000);
+  for (let i = 0; i < count; i++) {
+    stars.push({
+      x: Math.floor(Math.random() * skyCanvas.width / 4) * 4,
+      y: Math.floor(Math.random() * (skyCanvas.height * 0.75) / 4) * 4,
+      size: Math.random() < 0.15 ? 4 : 2,
+      twinkle: Math.random() * Math.PI * 2,
+      speed: 0.02 + Math.random() * 0.04,
+      color: Math.random() < 0.3 ? '#A78BFA' : Math.random() < 0.5 ? '#7DF9FF' : '#ffffff',
+    });
+  }
+}
+buildStars();
+
+// PIXEL MOUNTAINS (3 layers)
+const mountainLayers = [
+  { color: '#0d1535', peaks: [], speed: 0.15, offset: 0, yBase: 0.85 },
+  { color: '#111e40', peaks: [], speed: 0.3,  offset: 0, yBase: 0.90 },
+  { color: '#162550', peaks: [], speed: 0.6,  offset: 0, yBase: 0.95 },
+];
+function buildMountains() {
+  mountainLayers.forEach((layer, li) => {
+    layer.peaks = [];
+    const count = 20 + li * 5;
+    for (let i = 0; i < count + 2; i++) {
+      layer.peaks.push({
+        x: (i / count) * (skyCanvas.width + 200) - 100,
+        h: (0.08 + Math.random() * 0.12) * skyCanvas.height * (1 - li * 0.2),
+      });
+    }
+  });
+}
+buildMountains();
+
+function drawMountains() {
+  mountainLayers.forEach(layer => {
+    const baseY = layer.yBase * skyCanvas.height;
+    sctx.fillStyle = layer.color;
+    sctx.beginPath();
+    sctx.moveTo(-10, skyCanvas.height);
+    layer.peaks.forEach((p, i) => {
+      const x = ((p.x + layer.offset) % (skyCanvas.width + 200)) - 100;
+      if (i === 0) sctx.lineTo(x, baseY);
+      else {
+        const px = (((layer.peaks[i-1].x + layer.offset) % (skyCanvas.width + 200)) - 100);
+        sctx.lineTo((px + x) / 2, baseY - p.h);
+        sctx.lineTo(x, baseY);
+      }
+    });
+    sctx.lineTo(skyCanvas.width + 10, skyCanvas.height);
+    sctx.closePath();
+    sctx.fill();
+    layer.offset += layer.speed;
+    if (layer.offset > skyCanvas.width + 200) layer.offset = 0;
+  });
+}
+
+// PIXEL CLOUDS
+const clouds = [];
+function buildClouds() {
+  for (let i = 0; i < 5; i++) {
+    clouds.push({
+      x: Math.random() * skyCanvas.width,
+      y: 40 + Math.random() * (skyCanvas.height * 0.45),
+      speed: 0.2 + Math.random() * 0.4,
+      scale: 1 + Math.random() * 2,
+      alpha: 0.06 + Math.random() * 0.08,
+    });
+  }
+}
+buildClouds();
+
+function drawCloud(x, y, scale, alpha) {
+  sctx.fillStyle = `rgba(180,200,255,${alpha})`;
+  const px = 8 * scale;
+  const blocks = [
+    [1,0],[2,0],[3,0],
+    [0,1],[1,1],[2,1],[3,1],[4,1],
+    [0,2],[1,2],[2,2],[3,2],[4,2],
+  ];
+  blocks.forEach(([bx, by]) => {
+    sctx.fillRect(
+      Math.floor(x + bx * px), Math.floor(y + by * px),
+      Math.floor(px), Math.floor(px)
+    );
+  });
+}
+
+// PIXEL MOON
+function drawMoon() {
+  const mx = skyCanvas.width * 0.8, my = skyCanvas.height * 0.12;
+  const px = 6;
+  sctx.fillStyle = '#fffbe6';
+  const moonPx = [
+    [1,0],[2,0],[3,0],
+    [0,1],[1,1],[2,1],[3,1],[4,1],
+    [0,2],[1,2],[2,2],[3,2],[4,2],
+    [0,3],[1,3],[2,3],[3,3],[4,3],
+    [1,4],[2,4],[3,4],
+  ];
+  moonPx.forEach(([bx,by]) => sctx.fillRect(mx+bx*px, my+by*px, px, px));
+  // crater
+  sctx.fillStyle = 'rgba(0,0,0,0.2)';
+  [[1,1],[2,2]].forEach(([bx,by]) => sctx.fillRect(mx+bx*px, my+by*px, px, px));
+  // glow
+  sctx.fillStyle = 'rgba(255,251,230,0.04)';
+  for(let r=1;r<=3;r++){
+    sctx.beginPath();
+    sctx.arc(mx+2.5*px, my+2.5*px, px*(2.5+r*1.5), 0, Math.PI*2);
+    sctx.fill();
+  }
+}
+
+// SHOOTING STARS
+const shooters = [];
+function spawnShooter() {
+  shooters.push({
+    x: Math.random() * skyCanvas.width * 0.8,
+    y: Math.random() * skyCanvas.height * 0.3,
+    len: 60 + Math.random() * 80,
+    speed: 8 + Math.random() * 6,
+    life: 1,
+    alpha: 1,
+  });
+}
+setInterval(() => { if (Math.random() < 0.4) spawnShooter(); }, 3000);
+
+function animateSky() {
+  sctx.clearRect(0, 0, skyCanvas.width, skyCanvas.height);
+  drawSky();
+
+  // twinkling stars
+  const t = Date.now() * 0.001;
+  stars.forEach(s => {
+    const a = 0.4 + 0.6 * Math.abs(Math.sin(t * s.speed + s.twinkle));
+    sctx.fillStyle = s.color.replace(')', `,${a})`).replace('rgb', 'rgba').replace('#', '');
+    // simple hex to rgba
+    sctx.globalAlpha = a;
+    sctx.fillStyle = s.color;
+    sctx.fillRect(s.x, s.y, s.size, s.size);
+    sctx.globalAlpha = 1;
+  });
+
+  drawMoon();
+
+  // clouds
+  clouds.forEach(c => {
+    drawCloud(c.x, c.y, c.scale, c.alpha);
+    c.x += c.speed;
+    if (c.x > skyCanvas.width + 100) c.x = -100;
+  });
+
+  // shooting stars
+  for (let i = shooters.length - 1; i >= 0; i--) {
+    const s = shooters[i];
+    sctx.globalAlpha = s.life;
+    sctx.strokeStyle = '#ffffff';
+    sctx.lineWidth = 2;
+    sctx.beginPath();
+    sctx.moveTo(s.x, s.y);
+    sctx.lineTo(s.x + s.len, s.y + s.len * 0.4);
+    sctx.stroke();
+    sctx.globalAlpha = 1;
+    s.x += s.speed; s.y += s.speed * 0.4; s.life -= 0.04;
+    if (s.life <= 0) shooters.splice(i, 1);
+  }
+
+  drawMountains();
+  requestAnimationFrame(animateSky);
+}
+animateSky();
+
+// ══════════════════════════════════
+// CUSTOM CURSOR
+// ══════════════════════════════════
+const cur = document.getElementById('cursor');
+const trailContainer = document.getElementById('cursor-trail');
+const trailDots = [];
+for (let i = 0; i < 8; i++) {
+  const d = document.createElement('div');
+  d.className = 'trail-dot';
+  d.style.opacity = (1 - i / 8) * 0.5 + '';
+  d.style.background = i % 2 === 0 ? '#7DF9FF' : '#A78BFA';
+  trailContainer.appendChild(d);
+  trailDots.push({ el: d, x: 0, y: 0 });
+}
+let mx = 0, my = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+});
+(function trailLoop() {
+  let px = mx, py = my;
+  trailDots.forEach(d => {
+    d.x += (px - d.x) * 0.3; d.y += (py - d.y) * 0.3;
+    d.el.style.left = (d.x - 2) + 'px'; d.el.style.top = (d.y - 2) + 'px';
+    px = d.x; py = d.y;
+  });
+  requestAnimationFrame(trailLoop);
+})();
+
+// ══════════════════════════════════
+// PARALLAX ORBS → mouse
+// ══════════════════════════════════
+document.addEventListener('mousemove', e => {
+  const cx = e.clientX / innerWidth - 0.5;
+  const cy = e.clientY / innerHeight - 0.5;
+  // subtle card tilt
+  document.querySelector('.card').style.transform =
+    `perspective(800px) rotateY(${cx*4}deg) rotateX(${-cy*4}deg)`;
+});
+
+// ══════════════════════════════════
+// RIPPLE
+// ══════════════════════════════════
 function ripple(e) {
   const btn = e.currentTarget;
   const r = document.createElement('span');
   r.classList.add('ripple');
   const rect = btn.getBoundingClientRect();
   r.style.left = (e.clientX - rect.left) + 'px';
-  r.style.top = (e.clientY - rect.top) + 'px';
+  r.style.top  = (e.clientY - rect.top)  + 'px';
   btn.appendChild(r);
-  setTimeout(() => r.remove(), 600);
+  setTimeout(() => r.remove(), 500);
 }
 
-// Particle system
-const canvas = document.getElementById('particles');
-const ctx = canvas.getContext('2d');
-let particles = [];
-
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+// ══════════════════════════════════
+// GLITCH
+// ══════════════════════════════════
+const glitchEl = document.getElementById('glitch-name');
+function triggerGlitch() {
+  glitchEl.classList.add('glitching');
+  setTimeout(() => glitchEl.classList.remove('glitching'), 200);
+  setTimeout(triggerGlitch, 2000 + Math.random() * 3500);
 }
-resize();
-window.addEventListener('resize', resize);
+setTimeout(triggerGlitch, 1000);
 
-class Particle {
-  constructor() { this.reset(); }
-  reset() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
-    this.size = Math.random() * 1.5 + 0.5;
-    this.vx = (Math.random() - 0.5) * 0.3;
-    this.vy = (Math.random() - 0.5) * 0.3;
-    this.alpha = Math.random() * 0.5 + 0.1;
-    const colors = ['125,249,255','167,139,250','255,95,95'];
-    this.color = colors[Math.floor(Math.random()*colors.length)];
+// ══════════════════════════════════
+// TYPEWRITER
+// ══════════════════════════════════
+const bioEl = document.getElementById('bio-text');
+const lines = ['Content Creator & Gamer 🎮', 'Building cool stuff 💻', 'Join my community! 🤝'];
+let li = 0, ci = 0, deleting = false;
+function typeWriter() {
+  const line = lines[li];
+  if (!deleting) {
+    ci++;
+    bioEl.innerHTML = line.slice(0, ci) + '<span class="bio-cursor">█</span>';
+    if (ci === line.length) { deleting = true; setTimeout(typeWriter, 1800); return; }
+  } else {
+    ci--;
+    bioEl.innerHTML = line.slice(0, ci) + '<span class="bio-cursor">█</span>';
+    if (ci === 0) { deleting = false; li = (li + 1) % lines.length; setTimeout(typeWriter, 400); return; }
   }
-  update() {
-    this.x += this.vx; this.y += this.vy;
-    if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) this.reset();
-  }
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${this.color},${this.alpha})`;
-    ctx.fill();
-  }
+  setTimeout(typeWriter, deleting ? 35 : 75);
 }
+typeWriter();
 
-for (let i = 0; i < 80; i++) particles.push(new Particle());
+// ══════════════════════════════════
+// RUNNER GAME
+// ══════════════════════════════════
+const runner    = document.getElementById('runner');
+const rWrap     = document.getElementById('runner-wrap');
+const obs       = document.getElementById('obstacle');
+const scoreEl   = document.getElementById('score');
+const hiEl      = document.getElementById('hi-score');
 
-function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => { p.update(); p.draw(); });
-  requestAnimationFrame(animate);
+const GROUND_W = 440, RUNNER_X = 50;
+let score = 0, hiScore = 0;
+let obsX = GROUND_W + 60, obsSpeed = 2;
+let jumping = false, jumpY = 0, jumpVY = 0;
+const GRAVITY = 1.1, JUMP_FORCE = -15;
+let frame = 1, frameTimer = 0, lastTime = 0;
+
+function gameLoop(ts) {
+  const dt = Math.min((ts - lastTime) / 16, 3); lastTime = ts;
+  score += dt * 0.5;
+  obsSpeed = 2 + score * 0.0025;
+  if (score > hiScore) hiScore = score;
+  scoreEl.textContent = 'SCORE: ' + String(Math.floor(score)).padStart(5, '0');
+  hiEl.textContent    = 'HI: '    + String(Math.floor(hiScore)).padStart(5, '0');
+
+  obsX -= obsSpeed * dt;
+  if (obsX < -30) obsX = GROUND_W + 60 + Math.random() * 100;
+  obs.style.left = obsX + 'px';
+
+  // auto jump
+  const dist = obsX - RUNNER_X;
+  if (dist > 0 && dist < 85 && !jumping) {
+    jumping = true; jumpVY = JUMP_FORCE;
+    document.getElementById('dust').style.opacity = '0';
+  }
+
+  if (jumping) {
+    jumpVY += GRAVITY * dt;
+    jumpY  += jumpVY * dt;
+    if (jumpY >= 0) { jumpY = 0; jumpVY = 0; jumping = false; document.getElementById('dust').style.opacity = '1'; }
+    runner.className = 'pixel-guy fj';
+  } else {
+    frameTimer += dt;
+    if (frameTimer > 6) { frameTimer = 0; frame = frame === 1 ? 2 : 1; runner.className = 'pixel-guy f' + frame; }
+  }
+  rWrap.style.bottom = (14 - jumpY) + 'px';
+  requestAnimationFrame(gameLoop);
 }
-animate();
+requestAnimationFrame(t => { lastTime = t; gameLoop(t); });
 </script>
 </body>
 </html>
